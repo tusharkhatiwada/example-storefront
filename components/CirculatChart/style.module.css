@@ -1,3 +1,10 @@
+.card {
+  display: flex;
+  justify-content: center;
+  max-width: 300px;
+  margin: 30px;
+}
+
 .circularChart {
   display: inline-block;
   transition: all 0.3s ease-in;

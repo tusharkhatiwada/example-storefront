@@ -1,21 +1,44 @@
-import React from "react";
-import Card from "@material-ui/core/Card";
-import CardContent from "@material-ui/core/CardContent";
-import Typography from "@material-ui/core/Typography";
+import React, { Component } from "react";
+import { withApollo } from "lib/apollo/withApollo";
+
+import { locales } from "translations/config";
+import fetchPrimaryShop from "staticUtils/shop/fetchPrimaryShop";
+import fetchTranslations from "staticUtils/translations/fetchTranslations";
 
 import CircularChart from "../../../components/CirculatChart";
 
-const Dashboard = () => {
-  return (
-    <Card style={{ maxWidth: 300, justifyContent: "center", display: "flex", margin: 30 }}>
-      <CardContent>
-        <Typography variant="h5" component="h2" style={{ textAlign: "center" }}>
-          Facebook
-        </Typography>
-        <CircularChart progress={0.67} color="#D73775"></CircularChart>
-      </CardContent>
-    </Card>
-  );
-};
+class Dashboard extends Component {
+  render() {
+    const { shop } = this.props;
+    const label = shop?.name || "Default Label";
+    return <CircularChart value={0.67} color="#D73775" label={label}></CircularChart>;
+  }
+}
 
-export default Dashboard;
+/**
+ *  Static props for the dashboard
+ *
+ * @returns {Object} the props
+ */
+export async function getStaticProps({ params: { lang } }) {
+  return {
+    props: {
+      ...(await fetchPrimaryShop(lang)),
+      ...(await fetchTranslations(lang, ["common"])),
+    },
+  };
+}
+
+/**
+ *  Static paths for the dashboard
+ *
+ * @returns {Object} thepaths
+ */
+export async function getStaticPaths() {
+  return {
+    paths: locales.map((locale) => ({ params: { lang: locale } })),
+    fallback: false,
+  };
+}
+
+export default withApollo()(Dashboard);
